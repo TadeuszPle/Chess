@@ -46,17 +46,14 @@ def main():
                     if sqSelected == (row, col):  # clicking twice the same sq deselects everything
                         sqSelected = ()
                         playerClicks = []
-                        print('deselected')
                     else:
                         sqSelected = (row, col)
                         playerClicks.append(sqSelected)
                     if len(playerClicks) == 2:  # after 2nd click
                         move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                        print('move wanted:', move.getChessNotation())
                         for i in range(len(validMoves)):
                             if move == validMoves[i]:
                                 gs.makeMove(validMoves[i])
-                                print('move made:', validMoves[i].getChessNotation())
                                 moveMade = True
                                 animate = True
                                 gameOver = False
@@ -116,6 +113,16 @@ def drawText(screen, text):
 
 
 def highlightSquares(screen, gs, validMoves, sqSelected):
+
+    # highlight last move
+    if len(gs.moveLog) != 0:
+        lastMove = gs.moveLog[-1]
+        s = p.Surface((SQ_SIZE, SQ_SIZE))
+        s.set_alpha(70)
+        s.fill(p.Color('orange'))
+        screen.blit(s, (lastMove.startCol * SQ_SIZE, lastMove.startRow * SQ_SIZE))
+        screen.blit(s, (lastMove.endCol * SQ_SIZE, lastMove.endRow * SQ_SIZE))
+
     if sqSelected != ():
         r, c = sqSelected
         if gs.board[r][c][0] == ('w' if gs.whiteToMove else 'b'):

@@ -59,10 +59,8 @@ class GameState:
 
         # update if enpassant can be made if other move than 2 square advance is made
         if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2:
-            print("enpassant possible on square", ((move.endRow + move.startRow) // 2, move.endCol))
             self.enPassantPossible = ((move.endRow + move.startRow) // 2, move.endCol)
         else:
-            print("enpassant not possible")
             self.enPassantPossible = ()
 
         if move.isEnpassantMove:
@@ -183,14 +181,14 @@ class GameState:
                 else:
                     break  # off board
 
-        for m in self.knightDirections:
-            endRow = startRow + m[0]
-            endCol = startCol + m[0]
+        for d in self.knightDirections:
+            endRow = startRow + d[0]
+            endCol = startCol + d[1]
             if 0 < endRow < 8 and 0 < endCol < 8:
                 endPiece = self.board[endRow][endCol]
-                if endPiece[0] == enemyColor and endPiece == 'N':
+                if endPiece[0] == enemyColor and endPiece[1] == 'N':
                     inCheck = True
-                    checks.append((endRow, endCol, m[0], m[1]))
+                    checks.append((endRow, endCol, d[0], d[1]))
         return inCheck, pins, checks
 
     def getValidMoves(self):
@@ -230,9 +228,9 @@ class GameState:
             moves = self.getAllPossibleMoves()
 
         if self.whiteToMove:
-            self.getCastlingMoves(self.whiteKingLocation[0],self.whiteKingLocation[1],moves)
+            self.getCastlingMoves(self.whiteKingLocation[0], self.whiteKingLocation[1], moves)
         else:
-            self.getCastlingMoves(self.blackKingLocation[0],self.blackKingLocation[1],moves)
+            self.getCastlingMoves(self.blackKingLocation[0], self.blackKingLocation[1], moves)
 
         if len(moves) == 0:
             if self.inCheck:
@@ -472,7 +470,6 @@ class Move:
         # Enpassant
         self.isEnpassantMove = isEnpassantMove
         if self.isEnpassantMove:
-            print("found a enpassant?")
             self.pieceCaptured = 'bp' if self.pieceMoved == 'wp' else 'wp'
 
         # Castling
