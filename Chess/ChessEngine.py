@@ -228,13 +228,19 @@ class GameState:
                 self.getKingMoves(kingRow, kingCol, moves)
         else:
             moves = self.getAllPossibleMoves()
-        self.currentCastlingRights = tempCastleRights
+
+        if self.whiteToMove:
+            self.getCastlingMoves(self.whiteKingLocation[0],self.whiteKingLocation[1],moves)
+        else:
+            self.getCastlingMoves(self.blackKingLocation[0],self.blackKingLocation[1],moves)
 
         if len(moves) == 0:
             if self.inCheck:
                 self.checkmate = True
             else:
                 self.stalemate = True
+
+        self.currentCastlingRights = tempCastleRights
 
         return moves
 
@@ -367,7 +373,6 @@ class GameState:
                         self.whiteKingLocation = (r, c)
                     else:
                         self.blackKingLocation = (r, c)
-        self.getCastlingMoves(r, c, moves)
 
     def getKnightMoves(self, r, c, moves):
         enemyColor = 'b' if self.whiteToMove else 'w'

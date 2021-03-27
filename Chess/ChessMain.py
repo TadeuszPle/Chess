@@ -102,17 +102,17 @@ def main():
         p.display.flip()
 
 
-'''Highligh piece and squares piece can move to '''
+'''Highlight piece and squares piece can move to '''
 
 
 def drawText(screen, text):
     font = p.font.SysFont("Helvetica", 32, True, False)
     textObject = font.render(text, 0, p.Color("Black"))
     textLocation = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH / 2 - textObject.get_width() / 2,
-                                                    HEIGHT/2 - textObject.get_height() / 2)
+                                                    HEIGHT / 2 - textObject.get_height() / 2)
     screen.blit(textObject, textLocation)
     textObject = font.render(text, 0, p.Color("Blue"))
-    screen.blit(textObject, textLocation.move(2,2))
+    screen.blit(textObject, textLocation.move(2, 2))
 
 
 def highlightSquares(screen, gs, validMoves, sqSelected):
