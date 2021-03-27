@@ -32,8 +32,8 @@ class GameState:
         self.inCheck = False
         self.pins = []
         self.checks = []
-        self.checkMate = False
-        self.staleMate = False
+        self.checkmate = False
+        self.stalemate = False
         self.enPassantPossible = ()
         self.moveLog = []
         self.knightDirections = ((2, 1), (2, -1), (1, 2), (1, -2), (-1, 2), (-1, -2), (-2, -1), (-2, 1))
@@ -229,6 +229,13 @@ class GameState:
         else:
             moves = self.getAllPossibleMoves()
         self.currentCastlingRights = tempCastleRights
+
+        if len(moves) == 0:
+            if self.inCheck:
+                self.checkmate = True
+            else:
+                self.stalemate = True
+
         return moves
 
     def inCheck(self):
@@ -360,7 +367,7 @@ class GameState:
                         self.whiteKingLocation = (r, c)
                     else:
                         self.blackKingLocation = (r, c)
-        self.getCastlingMoves(r, c, moves, allyColor)
+        self.getCastlingMoves(r, c, moves)
 
     def getKnightMoves(self, r, c, moves):
         enemyColor = 'b' if self.whiteToMove else 'w'
