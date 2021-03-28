@@ -33,7 +33,7 @@ def main():
     sqSelected = ()  # last click of the user
     playerClicks = []  # keeps track of player clicks  - two tuples
     running = True
-    playerOne = False  # if a human is white this is True
+    playerOne = True  # if a human is white this is True
     playerTwo = False  # if a human is black  this is True
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
@@ -80,7 +80,10 @@ def main():
                     moveMade = False
         # AI move finder
         if not gameOver and not humanTurn:
-            AIMove = ChessAI.findRandomMove(validMoves)
+            AIMove = ChessAI.findBestMove(gs, validMoves)
+            if AIMove == None:
+                ChessAI.findRandomMove(validMoves)
+            # AIMove = ChessAI.findRandomMove(validMoves)
             gs.makeMove(AIMove)
             moveMade = True
             animate = True
