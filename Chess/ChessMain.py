@@ -1,5 +1,5 @@
 import pygame as p
-
+import ChessAI
 from Chess import ChessEngine
 
 WIDTH = HEIGHT = 512  # 400 OTHER GOOD OPTION
@@ -33,13 +33,16 @@ def main():
     sqSelected = ()  # last click of the user
     playerClicks = []  # keeps track of player clicks  - two tuples
     running = True
+    playerOne = False  # if a human is white this is True
+    playerTwo = False  # if a human is black  this is True
     while running:
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
                 # mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     location = p.mouse.get_pos()
                     col = location[0] // SQ_SIZE
                     row = location[1] // SQ_SIZE
@@ -67,7 +70,7 @@ def main():
                 if e.key == p.K_z:  # undo a move when z is pressed
                     gs.undoMove()
                     moveMade = True
-                    animate = False
+                    animate = False  # don't animate after a undo
                 if e.key == p.K_r:
                     gs = ChessEngine.GameState()
                     validMoves = gs.getValidMoves()
@@ -75,6 +78,12 @@ def main():
                     playerClicks = []
                     animate = False
                     moveMade = False
+        # AI move finder
+        if not gameOver and not humanTurn:
+            AIMove = ChessAI.findRandomMove(validMoves)
+            gs.makeMove(AIMove)
+            moveMade = True
+            animate = True
 
         if moveMade:
             if animate:
@@ -113,7 +122,6 @@ def drawText(screen, text):
 
 
 def highlightSquares(screen, gs, validMoves, sqSelected):
-
     # highlight last move
     if len(gs.moveLog) != 0:
         lastMove = gs.moveLog[-1]
