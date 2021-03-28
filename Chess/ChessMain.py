@@ -34,7 +34,7 @@ def main():
     playerClicks = []  # keeps track of player clicks  - two tuples
     running = True
     playerOne = True  # if a human is white this is True
-    playerTwo = False  # if a human is black  this is True
+    playerTwo = True  # if a human is black  this is True
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
@@ -71,17 +71,19 @@ def main():
                     gs.undoMove()
                     moveMade = True
                     animate = False  # don't animate after a undo
+                    gameOver = False
                 if e.key == p.K_r:
                     gs = ChessEngine.GameState()
                     validMoves = gs.getValidMoves()
                     sqSelected = ()
                     playerClicks = []
+                    gameOver = False
                     animate = False
                     moveMade = False
         # AI move finder
         if not gameOver and not humanTurn:
-            AIMove = ChessAI.findBestMove(gs, validMoves)
-            if AIMove == None:
+            AIMove = ChessAI.findBestMoveMinMax(gs, validMoves)
+            if AIMove is None:
                 ChessAI.findRandomMove(validMoves)
             # AIMove = ChessAI.findRandomMove(validMoves)
             gs.makeMove(AIMove)
@@ -112,6 +114,7 @@ def main():
 
 
 '''Highlight piece and squares piece can move to '''
+
 
 
 def drawText(screen, text):

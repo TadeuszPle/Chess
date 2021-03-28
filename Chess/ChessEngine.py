@@ -115,6 +115,10 @@ class GameState:
                     self.board[move.endRow][move.endCol - 2] = self.board[move.endRow][move.endCol + 1]
                     self.board[move.endRow][move.endCol + 1] = '--'
 
+            #undo checkmate and stalemate
+            self.checkmate = False
+            self.stalemate = False
+
     def updateCastleRights(self, move):
         if move.pieceMoved == "wK":
             self.currentCastlingRights.wks = False
