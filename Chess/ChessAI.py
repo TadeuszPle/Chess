@@ -10,7 +10,7 @@ def findRandomMove(validMoves):
     return validMoves[random.randint(0, len(validMoves) - 1)]
 
 
-def findBestMove(gs, validMoves):
+def findBestMoveNoRecursion(gs, validMoves):
     turnMultiplier = 1 if gs.whiteToMove else -1
     opponentMinMaxScore = CHECKMATE
     bestPlayerMove = None
@@ -27,16 +27,17 @@ def findBestMove(gs, validMoves):
             opponentMaxScore = -CHECKMATE
             for opponentMove in opponentMoves:
                 gs.makeMove(opponentMove)
+                gs.getValidMoves()
                 if gs.checkmate:
                     opponentMaxScore = CHECKMATE
                 elif gs.stalemate:
                     opponentMaxScore = STALEMATE
                 else:
-                    score = -turnMultiplier * scoreMaterial(gs.board)
+                    score = -turnMultiplier * scoreBoard(gs.board)
                 if score > opponentMaxScore:
                     opponentMaxScore = score
                 gs.undoMove()
-        if opponentMaxScore < opponentMinMaxScore :
+        if opponentMaxScore < opponentMinMaxScore:
             opponentMinMaxScore = opponentMaxScore
             bestPlayerMove = playerMove
         gs.undoMove()
@@ -46,19 +47,22 @@ def findBestMove(gs, validMoves):
 '''Score the board base on position'''
 
 
-def findBestMoveMinMax(gs, validMoves):
+def findBestMove(gs, validMoves):
     global nextMove
     nextMove = None
-    findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
+    random.shuffle(validMoves)
+    # findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
+    # findMoveNegaMax(gs, validMoves, DEPTH, 1 if gs.whiteToMove else -1)
+    findMoveNegaMaxAlphaBeta(gs, validMoves, -CHECKMATE, CHECKMATE, DEPTH, 1 if gs.whiteToMove else  -1)
     return nextMove
 
 
 def findMoveMinMax(gs, validMoves, depth, whiteToMove):
     global nextMove
     if depth == 0:
-        return scoreMaterial(gs.board)
+        return scoreBoard(gs.board)
     if whiteToMove:
-        maxScore = -CHECKMATE # at first we compare to the worst position possible trying to find a better position
+        maxScore = -CHECKMATE  # at first we compare to the worst position possible trying to find a better position
         for move in validMoves:
             gs.makeMove(move)
             nextMoves = gs.getValidMoves()
@@ -84,23 +88,64 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
         return minScore
 
 
+def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
+    global nextMove
+    if depth == 0:
+        return turnMultiplier * scoreBoard(gs)
+    maxScore = -CHECKMATE
+    for move in validMoves:
+        gs.makeMove(move)
+        nextMoves = gs.getValidMoves()
+        score = - findMoveNegaMax(gs, nextMoves, depth - 1, -turnMultiplier)
+        if score > maxScore:
+            maxScore = score
+            if depth == DEPTH:
+                nextMove = move
+        gs.undoMove()
+    return maxScore
+
+
+def findMoveNegaMaxAlphaBeta(gs, validMoves, alpha, beta, depth, turnMultiplier):
+    global nextMove
+    if depth == 0:
+        return turnMultiplier * scoreBoard(gs)
+
+    # move ordering - evaluate best moves first --> add later
+    maxScore = -CHECKMATE
+    for move in validMoves:
+        gs.makeMove(move)
+        nextMoves = gs.getValidMoves()
+        score = - findMoveNegaMaxAlphaBeta(gs, nextMoves, -beta, -alpha, depth - 1, -turnMultiplier)
+        if score > maxScore:
+            maxScore = score
+            if depth == DEPTH:
+                nextMove = move
+        gs.undoMove()
+        # update alpha
+        if maxScore > alpha:
+            alpha = maxScore
+        # previously checked moves are better for sure
+        if alpha >= beta:
+            break
+    return maxScore
+
+
 '''
 positive score good for white - negative score good for black
 '''
+
+
 def scoreBoard(gs):
-    score = 0
     if gs.checkmate:
         if gs.whiteToMove:
-            return -CHECKMATE # white lost
+            return -CHECKMATE  # white lost
         else:
-            return CHECKMATE # white wins
+            return CHECKMATE  # white wins
     if gs.stalemate:
         return STALEMATE
-    return score
-
-def scoreMaterial(board):
+    # score the pieces
     score = 0
-    for row in board:
+    for row in gs.board:
         for square in row:
             if square[0] == 'w':
                 score += pieceScore[square[1]]
