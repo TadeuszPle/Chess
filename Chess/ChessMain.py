@@ -37,7 +37,7 @@ def main():
     playerClicks = []  # keeps track of player clicks  - two tuples
     running = True
     playerOne = True  # if a human is white this is True
-    playerTwo = False  # if a human is black  this is True
+    playerTwo = True  # if a human is black  this is True
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
